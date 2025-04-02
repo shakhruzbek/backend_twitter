@@ -31,6 +31,8 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
+    console.log(username, password);
+    
     
     // Avval username bilan qidiramiz
     const result = await pool.query(
@@ -38,18 +40,21 @@ exports.login = async (req, res) => {
       [username]
     );
 
+    console.log(result);
+
     // Username mavjud bo'lmasa error qaytaramiz
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: "Invalid username or password" });
+      return res.status(404).json({ message: "Invalid username " });
     }
 
     // Agar username mavjud bo'lsa parolini bcrypt ila tekshiramiz
     const user = result.rows[0];
-    const isValidPassword = await bcrypt.compare(password, user.password);
+    // const isValidPassword = await bcrypt.compare(password, user.password);
+    const isValidPassword =  user.password == password ;
 
     // Parol noto'g'ri kiritilgan bo'lsa yana error qaytaramiz
     if(!isValidPassword) {
-      return res.status(404).json({ message: "Invalid username or password" });
+      return res.status(404).json({ message: "Invalid  password" });
     }
 
     const token = jwt.sign(
